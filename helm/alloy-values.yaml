@@ -1,0 +1,81 @@
+alloy:
+  configMap:
+    create: true
+    content: |
+      // OTLP receiver configuration
+      otelcol.receiver.otlp "otlp_receiver" {
+        grpc {
+          endpoint = "0.0.0.0:4317"
+        }
+        http {
+          endpoint = "0.0.0.0:4318"
+        }
+        output {
+          traces = [otelcol.exporter.otlp.tempo.input]
+        }
+      }
+      
+      // OTLP exporter to Tempo
+      otelcol.exporter.otlp "tempo" {
+        client {
+          endpoint = "tempo:4317"
+          tls {
+            insecure = true
+          }
+        }
+      }
+      
+      // Optional: Prometheus remote write for additional metrics
+      prometheus.remote_write "default" {
+        endpoint {
+          url = "http://monitoring-kube-prometheus-prometheus:9090/api/v1/write"
+        }
+      }
+
+  # Resource configuration
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 200m
+      memory: 512Mi
+
+  # Security context
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+    runAsGroup: 65534
+
+  # Extra ports to expose OTLP receivers
+  extraPorts:
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+      protocol: TCP
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
+      protocol: TCP
+
+  # Additional arguments for alloy
+  extraArgs:
+    - --storage.path=/tmp/alloy
+
+# Service configuration
+service:
+  enabled: true
+  type: ClusterIP
+  # Note: The chart automatically adds the http-metrics port
+  # We need to add our OTLP ports via the extraPorts in alloy section above
+
+# Global image settings
+image:
+  registry: docker.io
+  repository: grafana/alloy
+  pullPolicy: IfNotPresent
+
+# Controller settings
+controller:
+  type: deployment
+  replicas: 1

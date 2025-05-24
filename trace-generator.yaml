@@ -1,0 +1,47 @@
+# trace-generator-fixed.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k6-trace-generator
+  namespace: monitoring
+  labels:
+    app: k6-trace-generator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k6-trace-generator
+  template:
+    metadata:
+      labels:
+        app: k6-trace-generator
+    spec:
+      containers:
+      - name: k6-tracing
+        image: ghcr.io/grafana/xk6-client-tracing:v0.0.7
+        env:
+        - name: ENDPOINT
+          value: "alloy:4317"  # Send traces to Alloy OTLP endpoint
+        resources:
+          limits:
+            cpu: 200m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: k6-trace-generator
+  namespace: monitoring
+spec:
+  selector:
+    app: k6-trace-generator
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: http
+  type: ClusterIP
