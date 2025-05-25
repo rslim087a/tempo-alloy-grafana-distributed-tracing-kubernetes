@@ -1,18 +1,14 @@
 prometheus:
   prometheusSpec:
-    # Enable remote write receiver for Tempo metrics
+    # Enable remote write receiver for Tempo metrics (default: false)
     enableRemoteWriteReceiver: true
-    # Enable features for exemplars and native histograms
+    # Enable exemplar storage for metrics-traces linking (default: [])
     enableFeatures:
       - exemplar-storage
       - native-histograms
-    retention: 1h
-    
-    # Additional scrape configs if needed
-    additionalScrapeConfigs: []
 
 grafana:
-  # Enable anonymous access for demo purposes
+  # Enable anonymous access for demo (default: requires login)
   grafana.ini:
     auth.anonymous:
       enabled: true
@@ -22,10 +18,11 @@ grafana:
     feature_toggles:
       enable: traceqlEditor
   
-  # Install trace exploration plugin
+  # Add trace exploration plugin (default: no plugins)
   plugins:
     - grafana-exploretraces-app
   
+  # Connect Grafana to Tempo (default: only Prometheus datasource)
   datasources:
     datasources.yaml:
       apiVersion: 1
@@ -35,37 +32,19 @@ grafana:
           access: proxy
           url: http://tempo:3100
           uid: tempo
-          isDefault: false
-          editable: false
-          apiVersion: 1
           jsonData:
             httpMethod: GET
             serviceMap:
               datasourceUid: prometheus
-            search:
-              hide: false
-            nodeGraph:
-              enabled: true
             tracesToMetrics:
               datasourceUid: prometheus
-            spanBar:
-              type: Tag
-              tag: http.status_code
 
-  # Service configuration
-  service:
-    type: ClusterIP
-    port: 80
-
-# Disable components we don't need for this demo
+# Disable components for simpler demo setup
 alertmanager:
-  enabled: false
+  enabled: false  # Default: true
 
 nodeExporter:
-  enabled: false
-
-kubeStateMetrics:
-  enabled: true
+  enabled: false  # Default: true
 
 prometheus-node-exporter:
-  enabled: false
+  enabled: false  # Default: true

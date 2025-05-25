@@ -1,98 +1,18 @@
-image:
-  repository: grafana/tempo
-  tag: main-814c1c6
-  pullPolicy: IfNotPresent
-
-# Tempo configuration matching docker-compose setup
 tempo:
-  # Server configuration - FIXED: Use default port 3100 instead of 3200
-  server:
-    http_listen_port: 3100
-    log_level: info
+  # Specific commit for reproducibility
+  tag: main-814c1c6
     
-  # Storage configuration
-  storage:
-    trace:
-      backend: local
-      wal:
-        path: /tmp/tempo/wal
-      local:
-        path: /tmp/tempo/blocks
-        
-  # Distributor configuration  
-  distributor:
-    receivers:
-      otlp:
-        protocols:
-          grpc:
-            endpoint: "0.0.0.0:4317"
-            
-  # Query frontend configuration
-  query_frontend:
-    search:
-      duration_slo: 5s
-      throughput_bytes_slo: 1073741824
-      metadata_slo:
-        duration_slo: 5s
-        throughput_bytes_slo: 1073741824
-    trace_by_id:
-      duration_slo: 5s
+  # Metrics generator - The key feature for traces → metrics integration
+  metricsGenerator:
+    enabled: true
+    remoteWriteUrl: "http://monitoring-kube-prometheus-prometheus:9090/api/v1/write"
       
-  # Ingester configuration
-  ingester:
-    max_block_duration: 5m
-    
-  # Compactor configuration
-  compactor:
-    compaction:
-      block_retention: 1h
-      
-  # Metrics generator configuration
-  metrics_generator:
-    registry:
-      external_labels:
-        source: tempo
-        cluster: kubernetes
-    storage:
-      path: /tmp/tempo/generator/wal
-      remote_write:
-        - url: http://monitoring-kube-prometheus-prometheus:9090/api/v1/write
-          send_exemplars: true
-    traces_storage:
-      path: /tmp/tempo/generator/traces
-      
-  # Overrides configuration
+  # Enable service graphs and span metrics
   overrides:
     defaults:
       metrics_generator:
-        processors: [service-graphs, span-metrics, local-blocks]
-        
-  # Stream over HTTP
-  stream_over_http_enabled: true
+        processors: [service-graphs, span-metrics]
 
-# Service configuration - FIXED: Use port 3100
-service:
-  type: ClusterIP
-  port: 3100
-
-# Persistence for trace storage
+# Enable persistence for realistic setup
 persistence:
   enabled: true
-  size: 10Gi
-  accessModes:
-    - ReadWriteOnce
-
-# Resource limits
-resources:
-  limits:
-    cpu: 1000m
-    memory: 2Gi
-  requests:
-    cpu: 500m
-    memory: 1Gi
-
-# Security context
-securityContext:
-  runAsUser: 10001
-  runAsGroup: 10001
-  fsGroup: 10001
