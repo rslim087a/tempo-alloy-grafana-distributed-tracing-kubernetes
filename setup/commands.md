@@ -1,5 +1,7 @@
 # 1. Create namespace
+```
 kubectl create namespace monitoring
+```
 
 # 2. Add Helm repositories
 ```
