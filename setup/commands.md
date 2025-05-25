@@ -15,7 +15,7 @@ helm repo update
 helm install monitoring prometheus-community/kube-prometheus-stack \
   --version 72.6.2 \
   --namespace monitoring \
-  --values prometheus-stack-values.yaml \
+  --values helm/prometheus-stack-values.yaml \
   --wait
 ```
 
@@ -24,7 +24,7 @@ helm install monitoring prometheus-community/kube-prometheus-stack \
 helm install tempo grafana/tempo \
   --version 1.21.1 \
   --namespace monitoring \
-  --values tempo-values.yaml \
+  --values helm/tempo-values.yaml \
   --wait
 ```
 
@@ -33,7 +33,7 @@ helm install tempo grafana/tempo \
 helm install alloy grafana/alloy \
   --version 1.0.3 \
   --namespace monitoring \
-  --values alloy-values.yaml \
+  --values helm/alloy-values.yaml \
   --wait
 ```
 
