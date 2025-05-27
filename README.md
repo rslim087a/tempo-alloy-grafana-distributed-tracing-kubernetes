@@ -1,6 +1,6 @@
 # Kubernetes Distributed Tracing with Tempo, Alloy and Grafana
 
-This repo contains all the code needed to follow along with our **[YouTube Tutorial]()** or **[Written Article](https://kubernetestraining.io/blog/tempo-alloy-grafana-distributed-tracing-in-kubernetes)**.
+This repo contains all the code needed to follow along with our **[YouTube Tutorial](https://youtu.be/Br0HCHG5Mhc)** or **[Written Article](https://kubernetestraining.io/blog/tempo-alloy-grafana-distributed-tracing-in-kubernetes)**.
 
 ## Prerequisites
 
