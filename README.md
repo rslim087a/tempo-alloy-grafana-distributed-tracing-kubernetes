@@ -11,4 +11,4 @@ To follow along with this tutorial, you'll need:
 
 ## Become a Cloud and DevOps Engineer
 
-Learn every tool that matters: https://rayanslim.com
+Learn every tool that matters: [https://rslim087a.github.io/rayanslim](https://rslim087a.github.io/rayanslim)
